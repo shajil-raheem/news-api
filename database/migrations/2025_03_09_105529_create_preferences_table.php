@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('preferences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->nullable()->index();
-            $table->string('categories', 1000);
-            $table->string('authors', 1000);
-            $table->string('sources', 1000);
+            $table->bigInteger('user_id')->unsigned()->nullable()->unique();
+            $table->string('categories', 1000)->nullable();
+            $table->string('authors', 1000)->nullable();
+            $table->string('sources', 1000)->nullable();
             $table->timestamps();
         });
     }

@@ -18,3 +18,6 @@ use App\Http\Controllers\NewsController;
 Route::get('/news', [NewsController::class, 'index'])->middleware('auth:sanctum');
 Route::get('/personalized', [NewsController::class, 'personalized'])->middleware('auth:sanctum');
 
+use App\Http\Controllers\PreferenceController;
+Route::get('/preferences', [PreferenceController::class, 'index'])->middleware('auth:sanctum');
+Route::put('/preferences', [PreferenceController::class, 'upsert'])->middleware('auth:sanctum');

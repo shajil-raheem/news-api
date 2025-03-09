@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\News;
+use App\Models\Preference;
 
 class NewsController extends Controller
 {
@@ -48,7 +49,6 @@ class NewsController extends Controller
             $where[['category', '=', $category]];
         }
         $newsQuery = News::select([
-            'id',
             'source',
             'category',
             'author',
@@ -69,7 +69,10 @@ class NewsController extends Controller
             ->orderBy('id', 'desc')
             ->get();
         for($i = 0; isset($data[$i]); $i++) {
+            $data[$i]['contentUrl'] = $data[$i]['content_url'];
+            unset($data[$i]['content_url']);
             $data[$i]['categoryName'] = config('news.categories.preset')[$data[$i]['category']];
+            $data[$i]['sourceName'] = config('news.sources')[$data[$i]['source']];
         }
         return response()->json([
             'data' => $data,
@@ -79,8 +82,64 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function personalized()
+    public function personalized(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'offset' => ['nullable', 'integer'],
+            'limit' => ['nullable', 'integer'],
+        ]);
+        if($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $arr = $request->all();
+        $offset = trim($arr['offset'] ?? '') ?: 0;
+        $limit = trim($arr['limit'] ?? '') ?: 20;
+        $userId = Auth::user()->id;
+        $preferencesRow = Preference::select([
+                'categories',
+                'authors',
+                'sources',
+            ])
+            ->where('user_id', $userId)
+            ->first();
+        if(empty($preferencesRow)) {
+            return response()->json([], 200);
+        }
+        $categories = json_decode($preferencesRow['categories'], true) ?: [];
+        $authors = json_decode($preferencesRow['authors'], true) ?: [];
+        $sources = json_decode($preferencesRow['sources'], true) ?: [];
+
+        $newsQuery = News::select([
+            'source',
+            'category',
+            'author',
+            'date',
+            'title',
+            'description',
+            'content_url',
+        ]);
+        if(!empty($categories)) {
+            $newsQuery->whereIn('category', $categories);
+        }
+        if(!empty($authors)) {
+            $newsQuery->whereIn('author', $authors);
+        }
+        if(!empty($sources)) {
+            $newsQuery->whereIn('source', $sources);
+        }
+        $data = $newsQuery->offset((int)$offset)
+            ->limit($limit)
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+        for($i = 0; isset($data[$i]); $i++) {
+            $data[$i]['contentUrl'] = $data[$i]['content_url'];
+            unset($data[$i]['content_url']);
+            $data[$i]['categoryName'] = config('news.categories.preset')[$data[$i]['category']];
+            $data[$i]['sourceName'] = config('news.sources')[$data[$i]['source']];
+        }
+        return response()->json([
+            'data' => $data,
+        ]);
     }
 }

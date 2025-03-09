@@ -42,7 +42,7 @@ class StartNewsCollection extends Command
      */
     public function handle()
     {
-        // $this->theGuardianNewsCollector->run();
+        $this->theGuardianNewsCollector->run();
         $this->nyTimesNewsCollector->run();
     }
 }

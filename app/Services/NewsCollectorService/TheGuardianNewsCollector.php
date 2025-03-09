@@ -75,7 +75,7 @@ class TheGuardianNewsCollector {
             $newsRow = [
                 'source' => 'the_guardian',
                 'category' => config('news.categories.source_preset')[$value['sectionId']] ?? config('news.categories.default'),
-                'author' => $value['tags'][0]['webTitle'],
+                'author' => $value['tags'][0]['webTitle'] ?? 'Unknown',
                 'date' => date('Y-m-d', strtotime($value['webPublicationDate'])),
                 'title' => substr($value['webTitle'], 0, 200),
                 'description' => substr($value['webTitle'], 0, 500),
