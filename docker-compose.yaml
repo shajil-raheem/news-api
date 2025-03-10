@@ -1,0 +1,50 @@
+FROM php8.2-cli
+
+RUN apt-get update
+RUN apt-get install apache2
+RUN apt-get install php8.2-curl
+RUN apt-get install php8.2-ctype
+RUN apt-get install php8.2-dom
+RUN apt-get install php8.2-fileinfo
+RUN apt-get install php8.2-hash
+RUN apt-get install php8.2-filter
+RUN apt-get install php8.2-mbstring
+RUN apt-get install php8.2-openssl
+RUN apt-get install php8.2-pcre
+RUN apt-get install php8.2-pdo
+RUN apt-get install php8.2-session
+RUN apt-get install php8.2-tokenizer
+RUN apt-get install php8.2-xml
+RUN apt-get install php8.2-json
+RUN apt-get install php8.2-bz2
+RUN apt-get install php8.2-bcmath
+RUN apt-get install php8.2-opcache
+RUN apt-get install php8.2-mysql
+RUN apt-get install php8.2-gd
+RUN apt-get install mysql-server
+RUN apt-get install mysql-client
+RUN a2enmode rewrite
+
+WORKDIR /var/www/app
+
+RUN cp -r ./ ./
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+RUN php composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+
+WORKDIR ./app
+
+RUN composer install
+
+RUN cp .env.example .env
+
+RUN mysql -e "CREATE DATABASE news_api;"
+
+RUN php artisan:migrate
+
+RUN rm /var/www/html/index.html
+
+RUN cp ./public/* /var/www/html
+
+RUN chmod 775 /var/www/html/*
