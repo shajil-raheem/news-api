@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\NewsCollectorService\TheGuardianNewsCollector;
 use App\Services\NewsCollectorService\NyTimesNewsCollector;
+use App\Services\NewsCollectorService\OpenNewsCollector;
 
 class StartNewsCollection extends Command
 {
@@ -27,14 +28,17 @@ class StartNewsCollection extends Command
      */
     protected $theGuardianNewsCollector;
     protected $nyTimesNewsCollector;
+    protected $openNewsCollector;
     
     function __construct(
         TheGuardianNewsCollector $theGuardianNewsCollector,
         NyTimesNewsCollector $nyTimesNewsCollector,
+        OpenNewsCollector $openNewsCollector,
     ) {
         parent::__construct();
         $this->theGuardianNewsCollector = $theGuardianNewsCollector;
         $this->nyTimesNewsCollector = $nyTimesNewsCollector;
+        $this->openNewsCollector = $openNewsCollector;
     }
 
     /**
@@ -44,5 +48,6 @@ class StartNewsCollection extends Command
     {
         $this->theGuardianNewsCollector->run();
         $this->nyTimesNewsCollector->run();
+        $this->openNewsCollector->run();
     }
 }

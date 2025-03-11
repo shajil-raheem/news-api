@@ -7,6 +7,7 @@ use App\Models\News;
 use App\Models\Preference;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PreferenceController extends Controller
 {
@@ -15,24 +16,28 @@ class PreferenceController extends Controller
      */
     function index() {
         $userId = Auth::user()->id;
-        $preferencesRow = Preference::select([
-                'categories',
-                'authors',
-                'sources',
-            ])
-            ->where('user_id', $userId)
-            ->first();
-        $preferences = [
-            'categories' => [],
-            'authors' => [],
-            'sources' => [],
-        ];
-        if(!empty($preferencesRow)) {
+        $preferences = Cache::get('preferences-'.$userId);
+        if($preferences == null) {
+            $preferencesRow = Preference::select([
+                    'categories',
+                    'authors',
+                    'sources',
+                ])
+                ->where('user_id', $userId)
+                ->first();
             $preferences = [
-                'categories' => json_decode($preferencesRow['categories'], true),
-                'authors' => json_decode($preferencesRow['authors'], true),
-                'sources' => json_decode($preferencesRow['sources'], true),
+                'categories' => [],
+                'authors' => [],
+                'sources' => [],
             ];
+            if(!empty($preferencesRow)) {
+                $preferences = [
+                    'categories' => json_decode($preferencesRow['categories'], true),
+                    'authors' => json_decode($preferencesRow['authors'], true),
+                    'sources' => json_decode($preferencesRow['sources'], true),
+                ];
+            }
+            Cache::set('preferences-'.$userId, $preferences, now()->addDay()); // set cache for 24 hours
         }
         
         $categoriesArr = config('news.categories.preset');
@@ -43,11 +48,12 @@ class PreferenceController extends Controller
                 'name' => $value,
             ];
         }
-        $authorsDb = News::distinct()->select(['author'])->get()->toArray();
-        $authors = [];
-        foreach ($authorsDb as $row) {
-            $author = str_ireplace([' and ', ', '], ',', $row['author']);
-            $authors = [...$authors,...explode(',', $author)];
+
+        $authors = Cache::get('authors');
+        if($authors == null) {
+            $authorsDb = News::distinct()->select(['author'])->get()->toArray();
+            $authors = array_column($authorsDb, 'author');
+            Cache::set('authors', $authors, now()->addDay());
         }
         $sourcesArr = config('news.sources');
         $sources = [];
@@ -82,6 +88,7 @@ class PreferenceController extends Controller
                 ['user_id'],
                 ['authors', 'categories', 'authors', 'sources']
             );
+            Cache::forget('preferences-'.$userId);
         } catch (Exception $e) {
             \Log::error($e->getTraceAsString());
             return response()->json(['errors' => 'Internal Error Occured'], 500);

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Services\NewsCollectorService\TheGuardianNewsCollector;
 use App\Services\NewsCollectorService\NyTimesNewsCollector;
+use App\Services\NewsCollectorService\OpenNewsCollector;
 
 class NewsCollectorServiceProvider extends ServiceProvider
 {
@@ -18,6 +19,9 @@ class NewsCollectorServiceProvider extends ServiceProvider
         });
         $this->app->singleton(NyTimesNewsCollector::class, function ($app) {
             return new NyTimesNewsCollector();
+        });
+        $this->app->singleton(OpenNewsCollector::class, function ($app) {
+            return new OpenNewsCollector();
         });
     }
 

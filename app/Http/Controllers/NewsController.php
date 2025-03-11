@@ -25,7 +25,10 @@ class NewsController extends Controller
             'limit' => ['nullable', 'integer'],
         ]);
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Invalid Inputs',
+                'errors' => $validator->errors()
+            ], 422);
         }
         $filterData = $request->all();
         $dateFrom = '' . trim($filterData['dateFrom'] ?? '');
@@ -37,16 +40,16 @@ class NewsController extends Controller
         $limit = '' . trim($filterData['limit'] ?? '') ?: 20;
         $where = [];
         if($dateFrom) {
-            $where[['date', '>=', date('Y-m-d', strtotime($dateFrom))]];
+            $where[] = ['date', '>=', date('Y-m-d', strtotime($dateFrom))];
         }
         if($dateTo) {
-            $where[['date', '<=', date('Y-m-d', strtotime($dateTo))]];
+            $where[] = ['date', '<=', date('Y-m-d', strtotime($dateTo))];
         }
         if($source) {
-            $where[['source', '=', $source]];
+            $where[] = ['source', '=', $source];
         }
         if($category) {
-            $where[['category', '=', $category]];
+            $where[] = ['category', '=', $category];
         }
         $newsQuery = News::select([
             'source',
@@ -89,7 +92,10 @@ class NewsController extends Controller
             'limit' => ['nullable', 'integer'],
         ]);
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Invalid Inputs',
+                'errors' => $validator->errors()
+            ], 422);
         }
         $arr = $request->all();
         $offset = trim($arr['offset'] ?? '') ?: 0;

@@ -21,7 +21,10 @@ class UserController extends Controller
             'password' => ['required', 'string', 'min:6']
         ]);
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Invalid Inputs',
+                'errors' => $validator->errors()
+            ], 422);
         }
         $data = $request->all();
         try {

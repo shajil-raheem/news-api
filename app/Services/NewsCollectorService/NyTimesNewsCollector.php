@@ -4,6 +4,7 @@ namespace App\Services\NewsCollectorService;
 use App\Models\News;
 use \Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class NyTimesNewsCollector {
 
@@ -21,6 +22,7 @@ class NyTimesNewsCollector {
             if(!empty($newsArray)) { // 
                 News::insert($newsArray);
             }
+            Cache::forget('authors');
         } catch(Exception $e) {
             Log::error('Error : '.$e->getMessage());
             return false;
@@ -72,7 +74,7 @@ class NyTimesNewsCollector {
             $newsRow = [
                 'source' => 'ny_times',
                 'category' => config('news.categories.source_preset')[$value['section']] ?? config('news.categories.default'),
-                'author' => ltrim($value['byline'], ' By '),
+                'author' => ltrim($value['byline'], ' By ') ?: 'Unknown', // because author is empty sometimes
                 'date' => date('Y-m-d', strtotime($value['published_date'])),
                 'title' => substr($value['title'], 0, 200),
                 'description' => substr($value['abstract'], 0, 500),

@@ -80,5 +80,6 @@ return [
     'sources' => [
         'the_guardian' => 'The Guardian',
         'ny_times' => 'The New York Times',
+        'open_news' => 'Open News',
     ],
 ];

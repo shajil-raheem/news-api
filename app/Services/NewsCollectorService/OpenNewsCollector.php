@@ -6,13 +6,13 @@ use \Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
-class TheGuardianNewsCollector {
+class OpenNewsCollector {
 
     /**
      * the callable function
      */
     public function run() {
-        Log::info('The Guardian Collector : Start');
+        Log::info('News Api Collector : Start');
         try {
             $rawNewsArray = $this->getRawNewsFromAPI();
             Log::info('News imported');
@@ -32,16 +32,17 @@ class TheGuardianNewsCollector {
     }
 
     /**
-     * Get News from Source : The Guardian
+     * Get News from Source : Open News
      * @return array Raw News Data
      */
     private function getRawNewsFromAPI() : array {
-        $url = 'https://content.guardianapis.com/search';
+        $url = 'https://newsapi.org/v2/everything';
         $params = http_build_query([
-            'format' => 'json',
-            'from-date' => date('Y-m-d'),
-            'api-key' => env('THE_GUARDIAN_API_KEY'),
-            'show-tags' => 'contributor',
+            'q' => 'top-news-bbc',
+            'from' => date('Y-m-d'),
+            'to' => date('Y-m-d'),
+            'sortBy' => 'popularity',
+            'apiKey' => env('OPEN_NEWS_API_KEY'),
         ]);
         $url .= '?' . $params;
         $response = Http::get($url);
@@ -55,11 +56,11 @@ class TheGuardianNewsCollector {
         if(empty($responseArray)) {
             throw new Exception($url . ' Invalid Response', 1);
         }
-        if(!isset($responseArray['response'])) {
+        if(!isset($responseArray['articles'])) {
             $message = $responseArray['message'] ?? 'Invalid Response';
             throw new Exception($url . ' ' . $message, 1);
         }
-        return $responseArray['response']['results'] ?? [];
+        return $responseArray['articles'] ?? [];
     }
 
     /**
@@ -75,14 +76,14 @@ class TheGuardianNewsCollector {
         $i = 0;
         foreach ($rawArr as $value) {
             $newsRow = [
-                'source' => 'the_guardian',
-                'category' => config('news.categories.source_preset')[$value['sectionId']] ?? config('news.categories.default'),
-                'author' => @$value['tags'][0]['webTitle'] ?: 'Unknown', // because author is empty sometimes
-                'date' => date('Y-m-d', strtotime($value['webPublicationDate'])),
-                'title' => substr($value['webTitle'], 0, 200),
-                'description' => substr($value['webTitle'], 0, 500),
-                'content_url' => $value['webUrl'],
-                'id_from_source' => substr($value['id'], 0, 500),
+                'source' => 'open_news',
+                'category' => config('news.categories.default'),
+                'author' => $value['author'] ?: 'Unknown', // because author is empty sometimes
+                'date' => date('Y-m-d', strtotime($value['publishedAt'])),
+                'title' => substr($value['title'], 0, 200),
+                'description' => substr($value['description'], 0, 500),
+                'content_url' => $value['url'],
+                'id_from_source' => str_replace('https://www.androidauthority.com/', '', $value['url']),
                 'created_at' => now(),
             ];
             $newsArr[] = $newsRow;
