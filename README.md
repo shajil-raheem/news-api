@@ -2,6 +2,10 @@
     An attempt to aggregate news headlines from various sources.
 We've included integrations The Guardian, The Newyork Times, and Open News for now.
 
+## Postman Documentation Link
+
+https://documenter.getpostman.com/view/42942410/2sAYk8u2wf
+
 ## API Documentation [Open API Format]
 
 {
