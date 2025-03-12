@@ -1,6 +1,6 @@
 ## About News API
     An attempt to aggregate news headlines from various sources.
-We've included integrations The Guardian, The Newyork Times, and Open News for now.
+We've included integrations to The Guardian, The Newyork Times, and Open News for now.
 
 ## Postman Documentation Link
 
