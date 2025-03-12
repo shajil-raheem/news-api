@@ -2,6 +2,17 @@
     An attempt to aggregate news headlines from various sources.
 We've included integrations to The Guardian, The Newyork Times, and Open News for now.
 
+## How To Set Up Using Terminal
+### Open Terminal In Project Folder and Run The Commands 
+<pre>
+docker-compose up -d
+docker exec -it news_api_laravel bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+</pre>
+
 ## Postman Documentation Link
 
 https://documenter.getpostman.com/view/42942410/2sAYk8u2wf
