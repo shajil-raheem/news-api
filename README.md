@@ -7,7 +7,7 @@ We've included integrations The Guardian, The Newyork Times, and Open News for n
 https://documenter.getpostman.com/view/42942410/2sAYk8u2wf
 
 ## API Documentation [Open API Format]
-
+<pre>
 {
   "openapi": "3.0.0",
   "info": {
@@ -702,3 +702,4 @@ https://documenter.getpostman.com/view/42942410/2sAYk8u2wf
     }
   ]
 }
+</pre>
