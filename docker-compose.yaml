@@ -1,7 +1,7 @@
 services:
   app:
     image: php:8.2-fpm
-    container_name: news_api_laravel
+    container_name: news_api_php_app
     working_dir: /var/www
     volumes:
       - .:/var/www
@@ -13,7 +13,7 @@ services:
   
   web:
     image: nginx:latest
-    container_name: nginx
+    container_name: news_api_nginx
     ports:
       - "8000:80"
     volumes:
@@ -25,12 +25,12 @@ services:
 
   db:
     image: mysql:8
-    container_name: mysql
+    container_name: news_api_mysql
     environment:
       MYSQL_DATABASE: news_api
       MYSQL_USER: news_api
       MYSQL_PASSWORD: news_api
-      MYSQL_ROOT_PASSWORD: root9494
+      MYSQL_ROOT_PASSWORD:
     ports:
       - "3306:3306"
     volumes:

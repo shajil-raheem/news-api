@@ -5,12 +5,19 @@ We've included integrations to The Guardian, The Newyork Times, and Open News fo
 ## How To Set Up Using Terminal
 ### Open Terminal In Project Folder and Run The Commands 
 <pre>
-docker-compose up -d
+## please note that docker commands may require root/sudo permissions
+docker compose up -d
 docker exec -it news_api_laravel bash
+## to be run inside the container bash
+sh ./docker-php-setup.sh
 composer install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
+exit
+## back to host terminal
+docker restart news_api_php_app
+## done!
 </pre>
 
 ## Postman Documentation Link
