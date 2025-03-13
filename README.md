@@ -18,6 +18,7 @@ exit
 ## back to host terminal
 docker restart news_api_php_app
 ## done!
+The base URL is now localhost:8000
 </pre>
 
 ## Postman Documentation Link
